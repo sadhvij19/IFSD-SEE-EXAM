@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Politician Management</title>
+  <script src="https://unpkg.com/react/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/babel-standalone/babel.min.js"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    class Politician {
+      constructor(name, party, votes, money) {
+        this.name = name;
+        this.party = party;
+        this.votes = votes;
+        this.money = money;
+      }
+    }
+
+    class PoliticalParty extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = {
+          politicians: []
+        };
+      }
+
+      addPolitician = () => {
+        const name = prompt("Enter the name of the politician:");
+        const party = prompt("Enter the party of the politician:");
+        const votes = parseInt(prompt("Enter the votes for the politician:"));
+        const money = parseInt(prompt("Enter the money for the politician:"));
+
+        const politician = new Politician(name, party, votes, money);
+        this.setState(prevState => ({
+          politicians: [...prevState.politicians, politician]
+        }));
+      };
+
+      updatePoliticianVotes = (index) => {
+        const { politicians } = this.state;
+        const votes = parseInt(prompt("Enter the new votes for the politician:"));
+
+        const updatedPolitician = { ...politicians[index], votes };
+        politicians.splice(index, 1, updatedPolitician);
+        this.setState({ politicians: [...politicians] });
+      };
+
+      deletePolitician = (index) => {
+        const { politicians } = this.state;
+        politicians.splice(index, 1);
+        this.setState({ politicians: [...politicians] });
+      };
+
+      calculateMaxVotes = () => {
+        const { politicians } = this.state;
+        let maxVotesPolitician = null;
+        let maxVotes = -Infinity;
+
+        for (let i = 0; i < politicians.length; i++) {
+          if (politicians[i].votes > maxVotes) {
+            maxVotes = politicians[i].votes;
+            maxVotesPolitician = politicians[i];
+          }
+        }
+
+        return maxVotesPolitician;
+      };
+
+      calculateMaxMoney = () => {
+        const { politicians } = this.state;
+        let maxMoneyPolitician = null;
+        let maxMoney = -Infinity;
+
+        for (let i = 0; i < politicians.length; i++) {
+          if (politicians[i].money > maxMoney) {
+            maxMoney = politicians[i].money;
+            maxMoneyPolitician = politicians[i];
+          }
+        }
+
+        return maxMoneyPolitician;
+      };
+
+      handleMenuSelection = (choice) => {
+        switch (choice) {
+          case "1":
+            this.addPolitician();
+            break;
+          case "2":
+            this.updatePoliticianVotes(parseInt(prompt("Enter the index of the politician to update:")));
+            break;
+          case "3":
+            this.deletePolitician(parseInt(prompt("Enter the index of the politician to delete:")));
+            break;
+          case "4":
+            alert(`Politician with maximum votes: ${this.calculateMaxVotes().name}`);
+            break;
+          case "5":
+            alert(`Politician with maximum money: ${this.calculateMaxMoney().name}`);
+            break;
+          default:
+            console.log("Invalid choice!");
+        }
+      };
+
+      render() {
+        const { politicians } = this.state;
+
+        return (
+          <div>
+            <h2>Politician Management</h2>
+
+            <div>
+              <h3>Options:</h3>
+              <p>1. Add Politician</p>
+              <p>2. Update Politician Votes</p>
+              <p>3. Delete Politician</p>
+              <p>4. Calculate Maximum Votes</p>
+              <p>5. Calculate Maximum Money</p>
+              <p>Choose an option (1-5): <input type="text" id="menuChoice" /></p>
+              <button onClick={() => this.handleMenuSelection(document.getElementById("menuChoice").value)}>
+                Submit
+              </button>
+            </div>
+
+            <h3>Politician List</h3>
+            <ul>
+              {politicians.map((politician, index) => (
+                <li key={index}>
+                  Name: {politician.name}, Party: {politician.party}, Votes: {politician.votes}, Money: {politician.money}
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      }
+    }
+
+    ReactDOM.render(<PoliticalParty />, document.getElementById("root"));
+  </script>
+</body>
+
+</html>
